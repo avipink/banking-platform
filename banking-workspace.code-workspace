@@ -1,0 +1,12 @@
+{
+  "folders": [
+    { "path": ".",                      "name": "Orchestrator (banking-platform)" },
+    { "path": "../banking-contracts",   "name": "Contracts (banking-contracts)" },
+    { "path": "../accounts-core-svc",   "name": "Core: Accounts (8081)" },
+    { "path": "../payments-core-svc",   "name": "Core: Payments (8082)" },
+    { "path": "../banking-bff",         "name": "BFF (8080)" }
+  ],
+  "settings": {
+    "claude-code.autoApprove": false
+  }
+}

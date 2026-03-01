@@ -5,7 +5,11 @@ services:
     working_dir: /workspace/accounts-core-svc
     volumes:
       - ../:/workspace
-      - gradle-cache:/home/gradle/.gradle
+      - gradle-cache-accounts:/home/gradle/.gradle
+      # Give each service its own isolated banking-contracts build + lock dirs
+      # so concurrent Gradle daemons don't fight over the included-build write lock.
+      - contracts-build-accounts:/workspace/banking-contracts/build
+      - contracts-gradle-accounts:/workspace/banking-contracts/.gradle
     ports:
       - "8081:8081"
     command: gradle bootRun
@@ -14,19 +18,26 @@ services:
       interval: 15s
       timeout: 5s
       retries: 12
-      start_period: 90s
+      start_period: 120s
 
   payments-core-svc:
     image: gradle:8.5-jdk17
     working_dir: /workspace/payments-core-svc
     volumes:
       - ../:/workspace
-      - gradle-cache:/home/gradle/.gradle
+      - gradle-cache-payments:/home/gradle/.gradle
+      - contracts-build-payments:/workspace/banking-contracts/build
+      - contracts-gradle-payments:/workspace/banking-contracts/.gradle
     ports:
       - "8082:8082"
     command: gradle bootRun
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8082/api/v1/payments/account/ACC-001"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 120s
     environment:
-      # Override application.yml — use Docker service name, not localhost
       - ACCOUNTS_SERVICE_BASE_URL=http://accounts-core-svc:8081
     depends_on:
       accounts-core-svc:
@@ -37,12 +48,13 @@ services:
     working_dir: /workspace/banking-bff
     volumes:
       - ../:/workspace
-      - gradle-cache:/home/gradle/.gradle
+      - gradle-cache-bff:/home/gradle/.gradle
+      - contracts-build-bff:/workspace/banking-contracts/build
+      - contracts-gradle-bff:/workspace/banking-contracts/.gradle
     ports:
       - "8080:8080"
     command: gradle bootRun
     environment:
-      # Override application.yml — use Docker service names, not localhost
       - ACCOUNTS_SERVICE_BASE_URL=http://accounts-core-svc:8081
       - PAYMENTS_SERVICE_BASE_URL=http://payments-core-svc:8082
     depends_on:
@@ -52,4 +64,12 @@ services:
         condition: service_healthy
 
 volumes:
-  gradle-cache:
+  gradle-cache-accounts:
+  gradle-cache-payments:
+  gradle-cache-bff:
+  contracts-build-accounts:
+  contracts-build-payments:
+  contracts-build-bff:
+  contracts-gradle-accounts:
+  contracts-gradle-payments:
+  contracts-gradle-bff:

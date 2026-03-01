@@ -1,0 +1,55 @@
+services:
+
+  accounts-core-svc:
+    image: gradle:8.5-jdk17
+    working_dir: /workspace/accounts-core-svc
+    volumes:
+      - ../:/workspace
+      - gradle-cache:/home/gradle/.gradle
+    ports:
+      - "8081:8081"
+    command: gradle bootRun
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8081/api/v1/accounts"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 90s
+
+  payments-core-svc:
+    image: gradle:8.5-jdk17
+    working_dir: /workspace/payments-core-svc
+    volumes:
+      - ../:/workspace
+      - gradle-cache:/home/gradle/.gradle
+    ports:
+      - "8082:8082"
+    command: gradle bootRun
+    environment:
+      # Override application.yml — use Docker service name, not localhost
+      - ACCOUNTS_SERVICE_BASE_URL=http://accounts-core-svc:8081
+    depends_on:
+      accounts-core-svc:
+        condition: service_healthy
+
+  banking-bff:
+    image: gradle:8.5-jdk17
+    working_dir: /workspace/banking-bff
+    volumes:
+      - ../:/workspace
+      - gradle-cache:/home/gradle/.gradle
+    ports:
+      - "8080:8080"
+    command: gradle bootRun
+    environment:
+      # Override application.yml — use Docker service names, not localhost
+      - ACCOUNTS_SERVICE_BASE_URL=http://accounts-core-svc:8081
+      - PAYMENTS_SERVICE_BASE_URL=http://payments-core-svc:8082
+    depends_on:
+      accounts-core-svc:
+        condition: service_healthy
+      payments-core-svc:
+        condition: service_healthy
+
+volumes:
+  gradle-cache:

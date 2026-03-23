@@ -1,0 +1,8 @@
+# AI-DLC transient state
+aidlc-docs/aidlc-state.md
+aidlc-docs/audit.md
+
+# OS / IDE
+.vscode/
+.DS_Store
+Thumbs.db

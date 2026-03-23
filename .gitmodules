@@ -1,0 +1,12 @@
+[submodule "banking-contracts"]
+	path = banking-contracts
+	url = https://github.com/avipink/banking-contracts.git
+[submodule "accounts-core-svc"]
+	path = accounts-core-svc
+	url = https://github.com/avipink/accounts-core-svc.git
+[submodule "payments-core-svc"]
+	path = payments-core-svc
+	url = https://github.com/avipink/payments-core-svc.git
+[submodule "banking-bff"]
+	path = banking-bff
+	url = https://github.com/avipink/banking-bff.git

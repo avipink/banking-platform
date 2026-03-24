@@ -1,0 +1,7 @@
+# Submodule internals (Claude Code reads these via /add-dir, not by scanning)
+**/node_modules/
+**/.git/
+
+# OS files
+.DS_Store
+Thumbs.db

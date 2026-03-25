@@ -534,22 +534,62 @@ The Operations stage will eventually include:
 # ── Banking Platform Orchestrator Context ──
 
 ## Ecosystem Map
-| Repo               | Path (relative from workspace root) | Role                            | Port          |
-|--------------------|--------------------------------------|---------------------------------|---------------|
-| banking-platform   | .                                 | Orchestrator: specs, governance | N/A           |
-| banking-contracts  | banking-contracts                 | Shared Kotlin DTOs & errors     | N/A (library) |
-| accounts-core-svc  | accounts-core-svc                 | Core: Account management        | 8081          |
-| payments-core-svc  | payments-core-svc                 | Core: Payment processing        | 8082          |
-| banking-bff        | banking-bff                       | BFF: Frontend aggregation       | 8080          |
+| Repo               | Path (relative from workspace root) | Role                                                                                                        | Port          |
+|--------------------|-------------------------------------|-------------------------------------------------------------------------------------------------------------|---------------|
+| banking-platform   | .                                   | Orchestrator: specs, governance, AI-DLC docs                                                                | N/A           |
+| banking-contracts  | banking-contracts                   | Shared contract library: DTOs, sealed error types, enums; kotlinx-serialization; Gradle composite build only — not a deployed service | N/A (library) |
+| accounts-core-svc  | accounts-core-svc                   | Core: Account management; leaf node — no outbound service calls; in-memory store (5 seeded accounts)        | 8081          |
+| payments-core-svc  | payments-core-svc                   | Core: Payment processing; calls accounts-core-svc ×2 per payment for account validation; in-memory store (3 seeded payments) | 8082          |
+| banking-bff        | banking-bff                         | BFF: Stateless frontend aggregation; sequential multi-service orchestration; contains clean + anti-pattern demo sub-packages | 8080          |
 
 ## Dependency Flow
-- banking-bff calls accounts-core-svc and payments-core-svc via HTTP
-- payments-core-svc calls accounts-core-svc via HTTP for account validation
-- All services depend on banking-contracts for shared DTOs and error types
-- banking-contracts is a library dependency (Gradle), not a runtime service
+**Runtime HTTP calls (Spring WebClient, synchronous `.block()` at service boundary):**
+- `banking-bff` → `accounts-core-svc`: `GET /api/v1/accounts` (paginated), `GET /api/v1/accounts/{id}`
+- `banking-bff` → `payments-core-svc`: `POST /api/v1/payments`, `GET /api/v1/payments/account/{accountId}`
+- `payments-core-svc` → `accounts-core-svc`: `GET /api/v1/accounts/{id}` ×2 per payment (source + destination validation)
+- `accounts-core-svc`: no outbound calls — leaf node in the dependency graph
+
+**Library dependency:**
+- All three runtime services depend on `banking-contracts` via Gradle composite build (`includeBuild("../banking-contracts")`) — no published Maven/Gradle artifact; must be co-located in the same workspace; version is unpinned
+
+**Call depth by operation:**
+- `POST /api/v1/dashboard/transfer` → 3 HTTP hops total (BFF → payments-svc → accounts-svc ×2, sequential)
+- `GET /api/v1/dashboard` → 2 HTTP hops (BFF → accounts-svc, then BFF → payments-svc, sequential)
+- `GET /api/v1/dashboard/accounts/{id}` → 2 HTTP hops (BFF → accounts-svc, then BFF → payments-svc, sequential)
+- `GET /api/v1/accounts/**`, `GET /api/v1/payments/**` (direct core service calls) → 1 hop, no fan-out
 
 ## Deployment Order
-banking-contracts → accounts-core-svc → payments-core-svc → banking-bff
+`banking-contracts` (build-time only) → `accounts-core-svc` (:8081) → `payments-core-svc` (:8082) → `banking-bff` (:8080)
+
+Rationale: `accounts-core-svc` has no outbound dependencies and must be healthy before `payments-core-svc`
+starts (payment creation calls `GET /api/v1/accounts/{id}` ×2 on startup path). Both core services must
+be reachable before `banking-bff` serves traffic. `banking-contracts` is a build-time artifact only —
+it is not started or deployed.
+
+## Verified Platform State (RE Synthesis — 2026-03-25)
+> Derived from reverse engineering all 4 repositories. Update this section as the platform evolves.
+
+**Persistence**: All runtime state is in-memory only (mock `MutableMap` stores, not a database).
+No Flyway/Liquibase. No JPA. Data is lost on service restart. Production target per code comments:
+replace with JPA-backed relational DB per service. Each service owns its data exclusively — no shared DB.
+
+**Messaging / Events**: None. No Kafka, no message brokers, no scheduled jobs, no async processing.
+All inter-service communication is synchronous HTTP. No saga, no outbox, no event sourcing.
+
+**External Integrations**: None. No payment processors, no KYC providers, no secrets managers,
+no service discovery. All service URLs are hardcoded to `localhost` in each service's `application.yml`.
+
+**Authentication**: None. All endpoints on all services are unauthenticated. No token forwarding
+from BFF to core services. CRITICAL gap per security-baseline (SEC-08, SEC-12).
+
+**Verified API surface:**
+- `accounts-core-svc` (:8081): `GET /api/v1/accounts`, `GET /api/v1/accounts/{id}`, `GET /api/v1/accounts/{id}/balance`, `POST /api/v1/accounts/{id}/hold`
+- `payments-core-svc` (:8082): `POST /api/v1/payments`, `GET /api/v1/payments/{id}`, `GET /api/v1/payments/account/{accountId}`
+- `banking-bff` (:8080): `GET /api/v1/dashboard`, `GET /api/v1/dashboard/accounts/{id}`, `POST /api/v1/dashboard/transfer`, `GET /api/v1/legacy/dashboard` (anti-pattern demo — not for production use)
+
+**Key functional gap**: `PaymentService` never checks source account balance — `PaymentError.InsufficientFunds`
+is defined in banking-contracts and handled in the exception handler but is never thrown.
+Full synthesis: `aidlc-docs/product-architecture.md`
 
 ## Cross-Repo Rules
 - Every feature touching BFF + Core MUST have a spec in specs/features/

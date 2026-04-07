@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "jira-atlassian": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "--env-file", ".env.local",
+        "-e", "TOOLSETS=all",
+        "-e", "JIRA_PROJECTS_FILTER=SDDPAY",
+        "ghcr.io/sooperset/mcp-atlassian:latest"
+      ]
+    }
+  }
+}

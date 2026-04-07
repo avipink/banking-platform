@@ -6,3 +6,6 @@ aidlc-docs/audit.md
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Environment
+.env.local

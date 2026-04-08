@@ -24,14 +24,47 @@
 
 **Process**
 1. Orchestrator reads the full story (Business Intent, Scope, Scenarios, Constraints, AC)
-2. Identifies ambiguities, missing edge cases, and scope boundary decisions
-3. Generates clarification questions (multiple-choice or open-ended as appropriate)
-4. Developer answers questions inline
-5. Orchestrator resolves any remaining ambiguities
+2. **Platform Alignment check**: Cross-reference every story assumption against verified platform state — load `CLAUDE.md` ecosystem map + Verified Platform State section + existing RE artifacts under `aidlc-docs/inception/reverse-engineering/`. Flag any assumption that references infrastructure, patterns, or features not present in the platform (e.g. Kafka, Redis, OAuth, external gateways, unimplemented service features).
+3. **IF misalignments found — mandatory escalation sequence** (skip to step 4 if none):
+   a. **Post a Jira comment** on `[STORY-KEY]` tagging the Product Owner from the `## Team Registry` table in `CLAUDE.md` (fall back to story reporter if PO field is blank; log which account was used in `audit.md`). Use this format:
+      ```
+      @[reporter] — Platform Alignment Review (AI-DLC Stage 1)
+
+      The following story assumptions cannot be fulfilled by the current platform state
+      and have been flagged before implementation begins:
+
+      | Assumption | Platform Reality | Proposed Resolution |
+      |---|---|---|
+      | [e.g. Kafka event streaming] | [No messaging infrastructure] | [Descope: synchronous response only] |
+
+      Action required: Please confirm whether to proceed with the descoped story (Option A)
+      or pause for platform discussion (Option B) before implementation continues.
+      ```
+   b. **Present the same findings to the developer in-session** as a named blocking prompt:
+      ```
+      ⚠️ PLATFORM ALIGNMENT FINDINGS — ACTION REQUIRED
+
+      The following assumptions in [STORY-KEY] conflict with the verified platform state.
+      A Jira comment has been posted tagging the story reporter.
+
+      [findings table]
+
+      How would you like to proceed?
+      A) Continue with descoped story — treat misaligned assumptions as out of scope for this iteration
+      B) Pause — escalate to PO/architect before continuing
+      ```
+   c. **Wait for explicit developer response** — do NOT proceed to clarification questions until Option A or B is chosen
+   d. If Option B: stop. Log decision in `audit.md`. Do not advance to Stage 2.
+   e. If Option A: document all misalignments under `## Platform Alignment` in `requirements-verification.md` as resolved out-of-scope decisions
+4. Identify genuine ambiguities, missing edge cases, and scope boundary decisions (platform misalignments already resolved above are excluded)
+5. Generate clarification questions (multiple-choice or open-ended as appropriate)
+6. Developer answers questions inline
+7. Orchestrator resolves any remaining ambiguities
 
 **Output**
 - `aidlc-docs/inception/requirements/requirements-verification.md`
   - Original story summary
+  - `## Platform Alignment` — list of assumptions invalidated against platform state + resolution (deferred/descoped), or "No misalignments found"
   - Clarification questions + developer answers
   - Resolved scope decisions
   - Any constraints added or modified as a result

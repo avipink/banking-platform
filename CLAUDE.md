@@ -10,6 +10,8 @@ The AI model intelligently assesses what stages are needed based on:
 3. Complexity and scope of change
 4. Risk and impact assessment
 
+**For standard story-level work initiated from a Jira story, use the 8-stage workflow defined in `aidlc-docs/ai-dlc-8-stage-run-template.md` as the mandatory execution sequence — invoke via `/project:run-story [STORY-KEY]`.**
+
 ## MANDATORY: Rule Details Loading
 **CRITICAL**: When performing any phase, you MUST read and use relevant content from rule detail files. Check these paths in order and use the first one that exists:
 - `.aidlc-rule-details/` (Cursor, Cline, Claude Code, GitHub Copilot)
@@ -142,6 +144,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 3. Execute requirements analysis:
    - Load reverse engineering artifacts (if brownfield)
    - Analyze user request (intent analysis)
+   - **MANDATORY (story-level work)**: Cross-reference all story assumptions against verified platform state — load `CLAUDE.md` ecosystem map + verified platform state section + existing RE artifacts. Flag any assumption referencing infrastructure, patterns, or features not present in the platform. If misalignments are found: (1) post a Jira comment on the story tagging the Product Owner from the `## Team Registry` table (fall back to story reporter if PO field is blank; log which account was used in audit.md) with a findings table and an explicit Option A (proceed descoped) / Option B (pause for platform discussion) prompt, (2) surface the same findings as a blocking in-session prompt to the developer, (3) wait for explicit choice before continuing — do NOT silently resolve and proceed. If Option A chosen: document under `## Platform Alignment` in requirements output. If Option B chosen: stop and log in audit.md.
    - Determine requirements depth needed
    - Assess current requirements
    - Ask clarifying questions (if needed)
@@ -532,6 +535,17 @@ The Operations stage will eventually include:
 - Project structure: See code-generation.md for patterns by project type
 
 # ── Banking Platform Orchestrator Context ──
+
+## Team Registry
+> Update this table when team members change. Used by AI-DLC Stage 1 to tag the correct stakeholder in Jira comments when platform alignment issues are found.
+
+| Role | Name | Jira Email |
+|------|------|------------|
+| Product Owner | Avi Pinkas | avipink@gmail.com |
+| Tech Lead | | |
+| Scrum Master | | |
+
+**Stage 1 tagging rule**: Tag the `Product Owner` entry. If the PO field is blank, fall back to the Jira story reporter. Log which account was used in `audit.md`.
 
 ## Ecosystem Map
 | Repo               | Path (relative from workspace root) | Role                                                                                                        | Port          |

@@ -2,6 +2,9 @@
 aidlc-docs/aidlc-state.md
 aidlc-docs/audit.md
 
+# Claude Code memory (local only — not for team sharing)
+aidlc-docs/ai-dlc-memory/
+
 # OS / IDE
 .vscode/
 .DS_Store

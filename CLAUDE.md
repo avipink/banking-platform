@@ -542,7 +542,7 @@ The Operations stage will eventually include:
 | Role | Name | Jira Email |
 |------|------|------------|
 | Product Owner | Avi Pinkas | avipink@gmail.com |
-| Tech Lead | | |
+| Tech Lead | Avi Pinkas | avipink@gmail.com |
 | Scrum Master | | |
 
 **Stage 1 tagging rule**: Tag the `Product Owner` entry. If the PO field is blank, fall back to the Jira story reporter. Log which account was used in `audit.md`.

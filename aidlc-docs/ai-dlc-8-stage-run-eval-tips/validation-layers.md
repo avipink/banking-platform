@@ -100,6 +100,6 @@ Run after each story completes. The most effective learning mechanism for a trai
 
 ## Practical Guidance
 
-- Run `/cost` at every stage gate to track per-stage token spend (session-cumulative delta)
+- Cost per stage is logged automatically by `run-story.md` — no manual `/cost` calls needed; review the cost & value entries in `audit.md` after the run
 - Use the `run-scorecard.md` template alongside each session for a quick pass/fail signal
 - After 3-4 runs a pattern emerges — which stages need tuning for your specific story types

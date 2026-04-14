@@ -60,9 +60,9 @@ Gaps in the log = the workflow was shortcut somewhere.
 Shows which stages were executed vs. skipped. After the run, verify every skip was justified.
 A skipped Functional Design on a story introducing a new data model is a red flag.
 
-**Scope creep detector**
-Compare Stage 3 `workflow-plan.md` against the Stage 4 diffs.
-If code was changed in files not listed in the plan, it needs explicit justification — not silence.
+**Scope creep check** _(manual — no tooling needed)_
+Open Stage 3 `workflow-plan.md` alongside the Stage 4 diff. Every file touched in the diff should
+appear in the plan. If a file was changed but not listed, it needs explicit justification — not silence.
 
 **Platform alignment signal**
 If Stage 1 produced zero alignment findings on a complex story, be skeptical.

@@ -13,13 +13,13 @@ Each stage produces a specific artifact. Inspect it before approving the gate �
 | 1 — Story Intake | `requirements-verification.md` | Platform Alignment section present; assumptions cross-referenced; no phantom infra (Kafka, Redis, OAuth, etc.) |
 | 2 — Scoped RE | Scoped context summaries (one per repo) | Affected files/classes correctly identified; no missed dependencies |
 | 3 — Workflow Planning | `workflow-plan.md` | Execution order respects dependency graph; per-repo task breakdown is specific enough to code from |
-| 4 — Implementation | Git diff per repo | Changes match plan scope exactly; no scope creep; no `!!` operators; no hardcoded URLs |
+| 4 — Implementation | Git diff per repo | Changes match plan scope exactly; no scope creep (see **Explanation Note** below); no `!!` operators; no hardcoded URLs |
 | 5 — Tests | Test output + coverage | All tests green; every Acceptance Criterion has a corresponding test case |
 | 6 — AI Reviewer | Review report | Both tracks (General Quality + Fintech Baseline) signed off; no blocking findings left open |
 | 7 — PR Creation | PR description on GitHub | All 5 fintech checklist items checked; AI sign-off block present; readable cold |
 | 8 — Merge | `audit.md` final entry + Jira story | Merge order respected (same as Stage 4 execution order); story transitioned to Done |
 
-> **Note — What "no scope creep" means**
+> **Explanation Note — What "no scope creep" means**
 > The Stage 4 diff must stay within the boundaries approved in Stage 3. If `workflow-plan.md` names
 > specific files to modify, the diff should touch only those files. Any additional change — a "related
 > improvement" or "while we're here" addition — is scope creep, even if well-intentioned.

@@ -16,7 +16,7 @@ Each stage produces a specific artifact. Inspect it before approving the gate �
 | 4 — Implementation | Git diff per repo | Changes match plan scope exactly; no scope creep (see **Explanation Note** below); no `!!` operators; no hardcoded URLs |
 | 5 — Tests | Test output + coverage | All tests green; every Acceptance Criterion has a corresponding test case |
 | 6 — AI Reviewer | Review report | Both tracks (General Quality + Fintech Baseline) signed off; no blocking findings left open |
-| 7 — PR Creation | PR description on GitHub | All 5 fintech checklist items checked; AI sign-off block present; readable cold |
+| 7 — PR Creation | PR description on GitHub | All 5 fintech checklist items checked; AI sign-off block present (see **Explanation Note** below); readable cold |
 | 8 — Merge | `audit.md` final entry + Jira story | Merge order respected (same as Stage 4 execution order); story transitioned to Done |
 
 > **Explanation Note — What "no scope creep" means**
@@ -30,6 +30,21 @@ Each stage produces a specific artifact. Inspect it before approving the gate �
 >
 > **How to detect it**: at the Stage 4 gate, cross-check every changed file against `workflow-plan.md`.
 > Any file not in the plan requires an explicit justification — not silence.
+
+> **Explanation Note — What "AI sign-off block present" means**
+> The PR description must include the AI Reviewer sign-off section produced at Stage 6:
+>
+> ```
+> ## AI Reviewer Sign-Off
+> - General Quality Track: ✅ / ❌
+> - Fintech Baseline Track: ✅ / ❌
+> - Blocking findings resolved: ✅ / ❌ [list if any]
+> ```
+>
+> This section is the traceability link between Stage 6 (AI review completed) and Stage 7 (PR created).
+> A human reviewer must be able to see at a glance that automated review was done and what the verdict was —
+> without having to go back and read the audit log.
+> If the block is missing or left blank, the PR fails the Stage 7 gate regardless of code quality.
 
 ---
 

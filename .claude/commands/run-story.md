@@ -48,6 +48,58 @@ For stages marked sonnet: proceed with current session model (Sonnet is the defa
 | 7 | PRs open with structured descriptions |
 | 8 | PRs merged, story closed, audit trail complete |
 
+## Cost & Value Logging (Every Stage Gate)
+
+Before presenting each stage approval gate, execute the following steps:
+
+1. Run `/cost` to get the current session cumulative cost
+2. Compute delta from the previous stage's cumulative cost (track the running total in-session)
+3. Append a structured entry to `aidlc-docs/audit.md`:
+
+```markdown
+## Stage [N] — [Stage Name] — Cost & Value Log
+**Timestamp**: [ISO 8601]
+**Token cost (this stage)**: ~$[delta]
+**Key output**: [artifact name or action completed]
+**Findings surfaced**: [count + brief description, or "none"]
+**Scope changes**: [yes + description, or "no"]
+**Value rating**: [High / Medium / Low] — [one-line rationale]
+
+Rating rules:
+- High = produced a finding that changed scope, caught an assumption, or blocked a bad path
+- Medium = confirmed existing understanding, no surprises
+- Low = stage executed but output was predictable/trivial given inputs
+
+---
+```
+
+**Note**: `/cost` is session-cumulative. Delta calculation requires tracking the previous reading in-session. If session was restarted mid-run, log "session restarted — delta unavailable" and record the new baseline.
+
+After Stage 8, append a run summary to `aidlc-docs/audit.md`:
+
+```markdown
+## Run Summary — Cost & Value
+**Story**: [STORY-KEY] — [title]
+**Total session cost**: ~$[total]
+
+| Stage | Cost | Value | Key Finding |
+|-------|------|-------|-------------|
+| 1 | $[n] | High/Med/Low | [one line] |
+| 2 | $[n] | High/Med/Low | [one line] |
+| 3 | $[n] | High/Med/Low | [one line] |
+| 4 | $[n] | High/Med/Low | [one line] |
+| 5 | $[n] | High/Med/Low | [one line] |
+| 6 | $[n] | High/Med/Low | [one line] |
+| 7 | $[n] | High/Med/Low | [one line] |
+| 8 | $[n] | High/Med/Low | [one line] |
+
+**Highest cost stage**: Stage [N] ($[amount])
+**Highest value stage**: Stage [N] ([rationale])
+**Tuning candidates**: [stages where Low value rating was assigned]
+
+---
+```
+
 ## Task Classification
 
 This command is for **standard story-level work** (cross-component, has ACs, goes to PR review).

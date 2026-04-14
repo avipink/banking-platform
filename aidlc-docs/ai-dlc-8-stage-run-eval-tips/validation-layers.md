@@ -19,6 +19,18 @@ Each stage produces a specific artifact. Inspect it before approving the gate �
 | 7 — PR Creation | PR description on GitHub | All 5 fintech checklist items checked; AI sign-off block present; readable cold |
 | 8 — Merge | `audit.md` final entry + Jira story | Merge order respected (same as Stage 4 execution order); story transitioned to Done |
 
+> **Note — What "no scope creep" means**
+> The Stage 4 diff must stay within the boundaries approved in Stage 3. If `workflow-plan.md` names
+> specific files to modify, the diff should touch only those files. Any additional change — a "related
+> improvement" or "while we're here" addition — is scope creep, even if well-intentioned.
+>
+> This matters especially in an AI context: the model may identify opportunities during implementation
+> and act on them without flagging it. These unplanned changes bypass the human judgment checkpoint
+> at Stage 3, may introduce unintended side effects, and make the diff harder to review at Stages 4 and 6.
+>
+> **How to detect it**: at the Stage 4 gate, cross-check every changed file against `workflow-plan.md`.
+> Any file not in the plan requires an explicit justification — not silence.
+
 ---
 
 ## Layer 2 — Cross-Cutting Signals

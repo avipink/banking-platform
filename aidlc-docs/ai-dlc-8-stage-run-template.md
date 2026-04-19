@@ -67,7 +67,9 @@ Do not begin a stage until the previous stage's approval gate is passed.
 **8-stage constraints** *(applied on top of CLAUDE.md defaults)*
 - Platform Alignment check is **mandatory** — cross-reference every story assumption against
   the Verified Platform State section in `CLAUDE.md`. If misalignments are found, follow the
-  escalation sequence defined in CLAUDE.md Requirements Analysis before proceeding.
+  CLAUDE.md Requirements Analysis escalation sequence — which requires **both** a blocking
+  in-session prompt to the developer AND a Jira comment to the Product Owner (per `## Team
+  Registry`) presenting Option A (proceed descoped) / Option B (pause for platform discussion).
 - Clarification depth: standard (functional + non-functional requirements).
 
 **Output artifacts**

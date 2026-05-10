@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(accounts-core-svc/bin/**)",
+      "Read(banking-bff/bin/**)",
+      "Read(banking-contracts/bin/**)",
+      "Read(payments-core-svc/bin/**)",
+      "Read(accounts-core-svc/build/**)",
+      "Read(banking-bff/build/**)",
+      "Read(banking-contracts/build/**)",
+      "Read(payments-core-svc/build/**)",
+      "Read(accounts-core-svc/.gradle/**)",
+      "Read(banking-bff/.gradle/**)",
+      "Read(banking-contracts/.gradle/**)",
+      "Read(payments-core-svc/.gradle/**)",
+      "Read(accounts-core-svc/.kotlin/**)",
+      "Read(banking-bff/.kotlin/**)",
+      "Read(banking-contracts/.kotlin/**)",
+      "Read(payments-core-svc/.kotlin/**)",
+      "Read(accounts-core-svc/out/**)",
+      "Read(banking-bff/out/**)",
+      "Read(banking-contracts/out/**)",
+      "Read(payments-core-svc/out/**)",
+      "Read(*/.idea/**)",
+      "Read(*/gradle/wrapper/gradle-wrapper.jar)",
+      "Read(**/*.hprof)",
+      "Read(**/hs_err_pid*)",
+      "Read(**/local.properties)"
+    ]
+  }
+}
